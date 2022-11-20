@@ -1,0 +1,53 @@
+#!/usr/bin/env python3
+import base64
+import json
+from lxml import etree
+WORK_DIR = "/var/www/html"
+out = {}
+parser = etree.XMLParser(strip_cdata=False)
+root = etree.parse("http://localhost:8081/stats", parser)
+assert root.getroot().tag == "inspircdstats"
+with open(f"{WORK_DIR}/blacklist", "r") as f:
+    BLACKLIST = f.read().splitlines()
+def unsanitize(node, default=""):
+    # workaround for weird behavior in insp's xml output
+    # https://github.com/inspircd/inspircd/blob/v3.7.0/src/modules/m_httpd_stats.cpp#L55
+    if node.text is None or node.text == "":
+        return default
+    elif str(etree.tostring(node)).startswith(f"b'<{node.tag}><![CDATA["):
+        missing_padding = len(node.text) % 4
+        if missing_padding:
+            v = node.text + "=" * (4 - missing_padding)
+        else:
+            v = node.text
+        try:
+            return base64.b64decode(v).decode("utf-8")
+        except:
+            return "failed to read topic as utf-8"
+    return node.text
+out["usercount"] = int(root.find("./general/usercount").text)
+out["opercount"] = int(root.find("./general/opercount").text)
+out["channelcount"] = int(root.find("./general/channelcount").text)
+out["currenttime"] = int(root.find("./general/currenttime").text)
+out["channels"] = []
+for c in root.findall("./channellist/channel"):
+    name = unsanitize(c.find("channelname"))
+    modes = c.find("./channelmodes").text
+    if (
+        # skip channels in the blacklist or with mode +s
+        name in BLACKLIST
+        or modes is None
+        or "s" in modes.split()[0]
+    ):
+        continue
+    out["channels"].append(
+        dict(
+            name=name,
+            topic=unsanitize(c.find("./channeltopic/topictext"), "(no topic set)"),
+            usercount=int(c.find("usercount").text),
+            webchatlink="https://apocalypse.irc4fun.net/" + name,
+        )
+    )
+out["channels"].sort(key=lambda x: x["name"].lower())
+with open(f"{WORK_DIR}/stats.json", "w") as f:
+    json.dump(out, f)
