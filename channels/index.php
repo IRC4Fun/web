@@ -6,7 +6,7 @@ include __DIR__."/header.php";
 
 	<a name="top"></a>
 	<ul>
-	<li> <font face="monospace" size="4"><img src="https://irc4fun.net/wp-content/uploads/2021/01/find.png"> There are <img src="https://irc4fun.net/wp-content/uploads/2021/01/group-1.png"> <strong><?=$stats->usercount?></strong> users & <img src="https://irc4fun.net/wp-content/uploads/2021/01/user_suit.png"> <strong><?=$stats->opercount?></strong> staff members across <img src="https://irc4fun.net/wp-content/uploads/2021/01/chat.png"> <strong><?=$stats->channelcount?></strong> channels.</li>
+	<li> <font face="monospace" size="4"><img src="https://irc4fun.net/wp-content/uploads/2021/01/find.png"> There are <img src="https://irc4fun.net/wp-content/uploads/2021/01/group-1.png"> <strong><?=htmlspecialchars($stats->usercount)?></strong> users & <img src="https://irc4fun.net/wp-content/uploads/2021/01/user_suit.png"> <strong><?=htmlspecialchars($stats->opercount)?></strong> staff members across <img src="https://irc4fun.net/wp-content/uploads/2021/01/chat.png"> <strong><?=htmlspecialchars($stats->channelcount)?></strong> channels.</li>
 	<li> <font face="monospace" size="4"><img src="https://irc4fun.net/wp-content/uploads/2021/01/chat.png"> Channels with <a href="https://irc4fun.net/kb/general/other/channel-modes/" target="_top">chanmode +s</a> set will be excluded from the list. <img src="https://irc4fun.net/wp-content/uploads/2021/01/srvr_info.png"></li>
 	<li> <font face="monospace" size="3">(the table is sortable by clicking on the column headers -- click on a <strong>#ChannelName</strong> to join it via <img src="https://irc4fun.net/wp-content/uploads/2021/01/chat-icon.png"> <a href="https://apocalypse.irc4fun.net/" target="_blank"><strong>WebChat</strong></a>, in a new window)</li>
 	</ul>
@@ -22,9 +22,9 @@ include __DIR__."/header.php";
 			<tbody data-link="row" class="rowlink">
 				<?php foreach($stats->channels as $channel): ?>
 					<tr>
-						<td><a href="<?=$channel->webchatlink?>" target="_blank"><img src="https://irc4fun.net/wp-content/uploads/2021/01/chat-icon.png"> <?=$channel->name?></a></td>
-						<td><?=$channel->usercount?></td>
-						<td style="word-wrap: break-word; white-space: pre-wrap; max-width:700px"><?=$channel->topic?></td>
+						<td><a href="<?=$channel->webchatlink?>" target="_blank"><img src="https://irc4fun.net/wp-content/uploads/2021/01/chat-icon.png"> <?=htmlspecialchars($channel->name)?></a></td>
+						<td><?=htmlspecialchars($channel->usercount)?></td>
+						<td style="word-wrap: break-word; white-space: pre-wrap; max-width:700px"><?=htmlspecialchars($channel->topic)?></td>
 					</tr>
 				<?php endforeach; ?>
 			</tbody>
